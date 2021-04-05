@@ -63,8 +63,23 @@ public:
         LIS_MODE_HIGH_RESOLUTION
     } operation_mode_t;
 
+    typedef enum
+    {
+        LIS_SAMPLING_FRQ_1HZ,
+        LIS_SAMPLING_FRQ_10HZ,
+        LIS_SAMPLING_FRQ_25HZ,
+        LIS_SAMPLING_FRQ_50HZ,
+        LIS_SAMPLING_FRQ_100HZ,
+        LIS_SAMPLING_FRQ_200HZ,
+        LIS_SAMPLING_FRQ_400HZ,
+        LIS_SAMPLING_FRQ_1600HZ_LP,
+        LIS_SAMPLING_FRQ_13444_5376HZ,
+    } sampling_frequency_t;
+
     bool Initialize(TwoWire &theWire, uint8_t addr);
+    void Setup(operation_mode_t mode, sampling_frequency_t sps, bool en_x, bool en_y, bool en_z);
     void SetMode(operation_mode_t mode);
+    void PowerDown();
 
 private:
     TwoWire *_wire;
