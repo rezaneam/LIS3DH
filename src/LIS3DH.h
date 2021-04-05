@@ -65,6 +65,12 @@ public:
 
     typedef enum
     {
+        LIS_INT_ACTIVE_LOW,
+        LIS_INT_ACTIVE_HIGH,
+    } interrupt_activation_mode_t;
+
+    typedef enum
+    {
         LIS_SAMPLING_FRQ_1HZ,
         LIS_SAMPLING_FRQ_10HZ,
         LIS_SAMPLING_FRQ_25HZ,
@@ -86,6 +92,10 @@ public:
 
     bool Initialize(TwoWire &theWire, uint8_t addr);
     void Setup(operation_mode_t mode, sampling_frequency_t sps, range_t range, bool en_x, bool en_y, bool en_z);
+    void SetSamplingFrequency(sampling_frequency_t sps);
+    void SetInterruptActivationMode(interrupt_activation_mode_t mode);
+    uint8_t GetStatus();
+    void SetRange(range_t range);
     void SetMode(operation_mode_t mode);
     void PowerDown();
 

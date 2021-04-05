@@ -99,6 +99,7 @@ void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
     };
     write(LIS3DH_REG_CTRL_REG1, value);
 }
+
 void LIS3DH::SetRange(range_t range)
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG4) & 0xCF;
@@ -144,12 +145,32 @@ void LIS3DH::SetMode(operation_mode_t mode)
     }
 }
 
+void LIS3DH::SetInterruptActivationMode(interrupt_activation_mode_t mode)
+{
+    switch (mode)
+    {
+    case interrupt_activation_mode_t::LIS_INT_ACTIVE_LOW:
+        set(LIS3DH_REG_CTRL_REG6, 1);
+        break;
+
+    case interrupt_activation_mode_t::LIS_INT_ACTIVE_HIGH:
+        unset(LIS3DH_REG_CTRL_REG6, 1);
+        break;
+    }
+}
+
+uint8_t LIS3DH::GetStatus()
+{
+    return read(LIS3DH_REG_STATUS_REG2);
+}
+
 void LIS3DH::set(uint8_t _register, uint8_t _bit)
 {
     uint8_t value = read(_register);
     value |= (1 << _bit);
     write(_register, value);
 }
+
 void LIS3DH::unset(uint8_t _register, uint8_t _bit)
 {
     uint8_t value = read(_register);
