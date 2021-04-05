@@ -76,8 +76,16 @@ public:
         LIS_SAMPLING_FRQ_13444_5376HZ,
     } sampling_frequency_t;
 
+    typedef enum
+    {
+        LIS_RANGE_2G,
+        LIS_RANGE_4G,
+        LIS_RANGE_8G,
+        LIS_RANGE_16G
+    } range_t;
+
     bool Initialize(TwoWire &theWire, uint8_t addr);
-    void Setup(operation_mode_t mode, sampling_frequency_t sps, bool en_x, bool en_y, bool en_z);
+    void Setup(operation_mode_t mode, sampling_frequency_t sps, range_t range, bool en_x, bool en_y, bool en_z);
     void SetMode(operation_mode_t mode);
     void PowerDown();
 

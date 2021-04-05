@@ -16,6 +16,7 @@ bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
 void LIS3DH::Setup(
     operation_mode_t mode,
     sampling_frequency_t sps,
+    range_t range,
     bool en_x, bool en_y, bool en_z)
 {
     SetMode(mode);
@@ -59,6 +60,63 @@ void LIS3DH::Setup(
         break;
     };
     write(LIS3DH_REG_CTRL_REG1, value);
+    SetRange(range);
+}
+
+void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
+{
+    uint8_t value = read(LIS3DH_REG_CTRL_REG1);
+    value &= 0x0F;
+    switch (sps)
+    {
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_1HZ:
+        value |= 0x10;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_10HZ:
+        value |= 0x20;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_25HZ:
+        value |= 0x30;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_50HZ:
+        value |= 0x40;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_100HZ:
+        value |= 0x50;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_200HZ:
+        value |= 0x60;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_400HZ:
+        value |= 0x70;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_1600HZ_LP:
+        value |= 0x80;
+        break;
+    case sampling_frequency_t::LIS_SAMPLING_FRQ_13444_5376HZ:
+        value |= 0x90;
+        break;
+    };
+    write(LIS3DH_REG_CTRL_REG1, value);
+}
+void LIS3DH::SetRange(range_t range)
+{
+    uint8_t value = read(LIS3DH_REG_CTRL_REG4) & 0xCF;
+    switch (range)
+    {
+    case range_t::LIS_RANGE_2G:
+        // Do nothing
+        break;
+    case range_t::LIS_RANGE_4G:
+        value |= 0x10;
+        break;
+    case range_t::LIS_RANGE_8G:
+        value |= 0x20;
+        break;
+    case range_t::LIS_RANGE_16G:
+        value |= 0x30;
+        break;
+    }
 }
 
 void LIS3DH::PowerDown()
