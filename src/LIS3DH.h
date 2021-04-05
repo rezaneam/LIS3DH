@@ -56,12 +56,21 @@
 class LIS3DH
 {
 public:
+    typedef enum
+    {
+        LIS_MODE_LOW_POWER,
+        LIS_MODE_NORMAL,
+        LIS_MODE_HIGH_RESOLUTION
+    } operation_mode_t;
+
     bool Initialize(TwoWire &theWire, uint8_t addr);
+    void SetMode(operation_mode_t mode);
 
 private:
     TwoWire *_wire;
     uint8_t _address;
-
+    void set(uint8_t _register, uint8_t _bit);
+    void unset(uint8_t _register, uint8_t _bit);
     void read(uint8_t _register, uint8_t _length, uint8_t *_values);
     uint8_t read(uint8_t _register);
     void write(uint8_t _register, uint8_t _value);

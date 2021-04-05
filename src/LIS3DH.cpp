@@ -1,4 +1,5 @@
 #include <LIS3DH.h>
+
 bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
 {
     _wire = &theWire;
@@ -10,6 +11,38 @@ bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
         return false;
     }
     return true;
+}
+
+void LIS3DH::SetMode(operation_mode_t mode)
+{
+    switch (mode)
+    {
+    case operation_mode_t::LIS_MODE_LOW_POWER:
+        set(LIS3DH_REG_CTRL_REG1, 3);
+        unset(LIS3DH_REG_CTRL_REG4, 3);
+        break;
+    case operation_mode_t::LIS_MODE_NORMAL:
+        unset(LIS3DH_REG_CTRL_REG1, 3);
+        unset(LIS3DH_REG_CTRL_REG4, 3);
+        break;
+    case operation_mode_t::LIS_MODE_HIGH_RESOLUTION:
+        unset(LIS3DH_REG_CTRL_REG1, 3);
+        set(LIS3DH_REG_CTRL_REG4, 3);
+        break;
+    }
+}
+
+void LIS3DH::set(uint8_t _register, uint8_t _bit)
+{
+    uint8_t value = read(_register);
+    value |= (1 << _bit);
+    write(_register, value);
+}
+void LIS3DH::unset(uint8_t _register, uint8_t _bit)
+{
+    uint8_t value = read(_register);
+    value &= ~(1 << _bit);
+    write(_register, value);
 }
 
 void LIS3DH::read(uint8_t _register, uint8_t _length, uint8_t *_values)
