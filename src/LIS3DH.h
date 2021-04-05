@@ -65,6 +65,12 @@ public:
 
     typedef enum
     {
+        LIS_INT_1,
+        LIS_INT_2,
+    } interrupt_target_t;
+
+    typedef enum
+    {
         LIS_INT_ACTIVE_LOW,
         LIS_INT_ACTIVE_HIGH,
     } interrupt_activation_mode_t;
@@ -94,6 +100,8 @@ public:
     void Setup(operation_mode_t mode, sampling_frequency_t sps, range_t range, bool en_x, bool en_y, bool en_z);
     void SetSamplingFrequency(sampling_frequency_t sps);
     void SetInterruptActivationMode(interrupt_activation_mode_t mode);
+    void MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration);
+    uint8_t ReadInterruptSource(interrupt_target_t interrupt);
     uint8_t GetStatus();
     void SetRange(range_t range);
     void SetMode(operation_mode_t mode);

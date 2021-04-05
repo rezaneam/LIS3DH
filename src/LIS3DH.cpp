@@ -63,6 +63,41 @@ void LIS3DH::Setup(
     SetRange(range);
 }
 
+void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration)
+{
+    uint8_t _register =
+        (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_CFG : LIS3DH_REG_INT2_CFG;
+    uint8_t value = read(_register) & 0x00;
+    if (enable)
+        value |= 0x0A;
+    write(_register, value);
+
+    if (enable)
+    {
+        set(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);
+        unset(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
+    }
+    else
+        unset(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);
+
+    if (enable)
+    {
+        _register =
+            (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_THS : LIS3DH_REG_INT2_THS;
+        write(_register, threshold);
+        _register =
+            (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_DURATION : LIS3DH_REG_INT2_DURATION;
+        write(_register, duration);
+    }
+}
+
+uint8_t LIS3DH::ReadInterruptSource(interrupt_target_t interrupt)
+{
+    uint8_t _register =
+        (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_SRC : LIS3DH_REG_INT2_SRC;
+    return read(_register);
+}
+
 void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG1);
