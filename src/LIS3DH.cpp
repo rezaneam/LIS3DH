@@ -61,6 +61,7 @@ void LIS3DH::Setup(
     };
     write(LIS3DH_REG_CTRL_REG1, value);
     SetRange(range);
+    readReference();
 }
 
 void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration)
@@ -89,6 +90,7 @@ void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t thr
             (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_DURATION : LIS3DH_REG_INT2_DURATION;
         write(_register, duration);
     }
+    readReference();
 }
 
 uint8_t LIS3DH::ReadInterruptSource(interrupt_target_t interrupt)
@@ -135,6 +137,23 @@ void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
     write(LIS3DH_REG_CTRL_REG1, value);
 }
 
+LIS3DH::range_t LIS3DH::GetRange()
+{
+    uint8_t value = (read(LIS3DH_REG_CTRL_REG4) & 0x30) >> 4;
+    switch (value)
+    {
+    case 0:
+        return range_t::LIS_RANGE_2G;
+    case 1:
+        return range_t::LIS_RANGE_4G;
+    case 2:
+        return range_t::LIS_RANGE_8G;
+    case 3:
+        return range_t::LIS_RANGE_16G;
+    }
+    return range_t::LIS_RANGE_2G;
+}
+
 void LIS3DH::SetRange(range_t range)
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG4) & 0xCF;
@@ -153,12 +172,24 @@ void LIS3DH::SetRange(range_t range)
         value |= 0x30;
         break;
     }
+    write(LIS3DH_REG_CTRL_REG4, value);
 }
 
 void LIS3DH::PowerDown()
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG1) & 0xF0;
     write(LIS3DH_REG_CTRL_REG1, value);
+}
+
+LIS3DH::operation_mode_t LIS3DH::GetMode()
+{
+    bool v1 = (bool)((read(LIS3DH_REG_CTRL_REG1) & 0x08) >> 3);
+    bool v2 = (bool)((read(LIS3DH_REG_CTRL_REG4) & 0x08) >> 3);
+    if (!v1 & !v2)
+        return operation_mode_t::LIS_MODE_NORMAL;
+    if (v1)
+        return operation_mode_t::LIS_MODE_LOW_POWER;
+    return operation_mode_t::LIS_MODE_HIGH_RESOLUTION;
 }
 
 void LIS3DH::SetMode(operation_mode_t mode)
@@ -199,6 +230,68 @@ uint8_t LIS3DH::GetStatus()
     return read(LIS3DH_REG_STATUS_REG2);
 }
 
+void LIS3DH::GetAcceleration(uint8_t *_buffer)
+{
+    read(LIS3DH_REG_OUT_X_L, 6, _buffer);
+}
+
+void LIS3DH::GetAcceleration(int16_t *_buffer)
+{
+    uint8_t local[6] = {0};
+
+    local[0] = read(LIS3DH_REG_OUT_X_L);
+    local[1] = read(LIS3DH_REG_OUT_X_H);
+    local[2] = read(LIS3DH_REG_OUT_Y_L);
+    local[3] = read(LIS3DH_REG_OUT_Y_H);
+    local[4] = read(LIS3DH_REG_OUT_Z_L);
+    local[5] = read(LIS3DH_REG_OUT_Z_H);
+
+    int16_t product = 1;
+    int16_t shifts = 256;
+    int16_t value;
+    // switch (GetMode())
+    // {
+    // case operation_mode_t::LIS_MODE_LOW_POWER:
+    //     //product *= 16;
+    //     shifts = 256;
+    //     break;
+    // case operation_mode_t::LIS_MODE_NORMAL:
+    //     //product *= 4;
+    //     shifts = 64;
+    //     break;
+    // case operation_mode_t::LIS_MODE_HIGH_RESOLUTION:
+    //     shifts = 16;
+    //     break;
+    // }
+
+    switch (GetRange())
+    {
+    case range_t::LIS_RANGE_2G:
+        product *= 16;
+        break;
+
+    case range_t::LIS_RANGE_4G:
+        product *= 32;
+        break;
+    case range_t::LIS_RANGE_8G:
+        product *= 64;
+        break;
+    case range_t::LIS_RANGE_16G:
+        product *= 256;
+        break;
+    }
+
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        value = (((int16_t)local[2 * i] | (((int16_t)local[2 * i + 1]) << 8)));
+        *(_buffer + i) = value * shifts / product;
+    }
+}
+
+void LIS3DH::readReference()
+{
+    read(LIS3DH_REG_REFERENCE);
+}
 void LIS3DH::set(uint8_t _register, uint8_t _bit)
 {
     uint8_t value = read(_register);

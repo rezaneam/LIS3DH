@@ -103,13 +103,18 @@ public:
     void MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration);
     uint8_t ReadInterruptSource(interrupt_target_t interrupt);
     uint8_t GetStatus();
+    range_t GetRange();
     void SetRange(range_t range);
+    operation_mode_t GetMode();
     void SetMode(operation_mode_t mode);
     void PowerDown();
+    void GetAcceleration(uint8_t *_buffer);
+    void GetAcceleration(int16_t *_buffer);
 
 private:
     TwoWire *_wire;
     uint8_t _address;
+    void readReference();
     void set(uint8_t _register, uint8_t _bit);
     void unset(uint8_t _register, uint8_t _bit);
     void read(uint8_t _register, uint8_t _length, uint8_t *_values);
