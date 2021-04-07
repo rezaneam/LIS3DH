@@ -247,44 +247,31 @@ void LIS3DH::GetAcceleration(int16_t *_buffer)
     local[5] = read(LIS3DH_REG_OUT_Z_H);
 
     int16_t product = 1;
-    int16_t shifts = 256;
+    int16_t shifts = 1;
     int16_t value;
-    // switch (GetMode())
-    // {
-    // case operation_mode_t::LIS_MODE_LOW_POWER:
-    //     //product *= 16;
-    //     shifts = 256;
-    //     break;
-    // case operation_mode_t::LIS_MODE_NORMAL:
-    //     //product *= 4;
-    //     shifts = 64;
-    //     break;
-    // case operation_mode_t::LIS_MODE_HIGH_RESOLUTION:
-    //     shifts = 16;
-    //     break;
-    // }
 
     switch (GetRange())
     {
     case range_t::LIS_RANGE_2G:
-        product *= 16;
+        shifts = 16;
         break;
-
     case range_t::LIS_RANGE_4G:
-        product *= 32;
+        shifts = 8;
         break;
     case range_t::LIS_RANGE_8G:
-        product *= 64;
+        shifts = 4;
         break;
     case range_t::LIS_RANGE_16G:
-        product *= 256;
+        product = 3;
+        shifts = 4;
         break;
     }
 
     for (uint8_t i = 0; i < 3; i++)
     {
-        value = (((int16_t)local[2 * i] | (((int16_t)local[2 * i + 1]) << 8)));
-        *(_buffer + i) = value * shifts / product;
+        value = (int16_t)(((int16_t)local[2 * i] | (((int16_t)local[2 * i + 1]) << 8)));
+        value = value * product;
+        *(_buffer + i) = value / shifts;
     }
 }
 
