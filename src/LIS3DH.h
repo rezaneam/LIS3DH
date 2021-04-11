@@ -97,6 +97,7 @@ public:
     } range_t;
 
     bool Initialize(TwoWire &theWire, uint8_t addr);
+    bool Initialize(TwoWire &theWir);
     void Setup(operation_mode_t mode, sampling_frequency_t sps, range_t range, bool en_x, bool en_y, bool en_z);
     void SetSamplingFrequency(sampling_frequency_t sps);
     void SetInterruptActivationMode(interrupt_activation_mode_t mode);

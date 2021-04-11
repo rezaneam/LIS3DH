@@ -13,6 +13,23 @@ bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
     return true;
 }
 
+bool LIS3DH::Initialize(TwoWire &theWire)
+{
+    _wire = &theWire;
+    _address = LIS3DH_ADD_PRIMARY;
+
+    uint8_t val_0 = read(LIS3DH_REG_WHO_AM_I);
+    if (val_0 == LIS3DH_VAL_WHO_AM_I)
+        return true;
+
+    _address = LIS3DH_ADD_SECONDARY;
+    uint8_t val_1 = read(LIS3DH_REG_WHO_AM_I);
+    if (val_1 == LIS3DH_VAL_WHO_AM_I)
+        return true;
+    printf("Error! Chip ID results were %X %X. Expected %X\r\n", val_0, val_1, LIS3DH_VAL_WHO_AM_I);
+    return true;
+}
+
 void LIS3DH::Setup(
     operation_mode_t mode,
     sampling_frequency_t sps,
