@@ -87,13 +87,17 @@ void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t thr
         (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_CFG : LIS3DH_REG_INT2_CFG;
     uint8_t value = read(_register) & 0x00;
     if (enable)
-        value |= 0x0A;
+        value |= 0x2A;
     write(_register, value);
+
+    // Enabling the HP filter
+    value = (interrupt == interrupt_target_t::LIS_INT_1) ? 0x09 : 0x0A;
+    write(LIS3DH_REG_CTRL_REG2, value);
 
     if (enable)
     {
         set(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);
-        unset(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
+        set(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
     }
     else
         unset(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);
