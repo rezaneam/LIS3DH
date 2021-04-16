@@ -27,7 +27,7 @@ bool LIS3DH::Initialize(TwoWire &theWire)
     if (val_1 == LIS3DH_VAL_WHO_AM_I)
         return true;
     printf("Error! Chip ID results were %X %X. Expected %X\r\n", val_0, val_1, LIS3DH_VAL_WHO_AM_I);
-    return true;
+    return false;
 }
 
 void LIS3DH::Setup(
