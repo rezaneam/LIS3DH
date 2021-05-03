@@ -71,7 +71,7 @@ void LIS3DH::Setup(
     readReference();
 }
 
-void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration)
+void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration, bool enable_latch)
 {
     uint8_t _register =
         (interrupt == interrupt_target_t::LIS_INT_1) ? LIS3DH_REG_INT1_CFG : LIS3DH_REG_INT2_CFG;
@@ -87,7 +87,10 @@ void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t thr
     if (enable)
     {
         set(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);
-        set(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
+        if (enable_latch)
+            set(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
+        else
+            unset(LIS3DH_REG_CTRL_REG5, (interrupt == interrupt_target_t::LIS_INT_1) ? 3 : 1);
     }
     else
         unset(LIS3DH_REG_CTRL_REG3, (interrupt == interrupt_target_t::LIS_INT_1) ? 6 : 5);

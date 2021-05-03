@@ -123,7 +123,7 @@ public:
     void Setup(operation_mode_t mode, sampling_frequency_t sps, range_t range, bool en_x, bool en_y, bool en_z);
     void SetSamplingFrequency(sampling_frequency_t sps);
     void SetInterruptActivationMode(interrupt_activation_mode_t mode);
-    void MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration);
+    void MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration, bool enable_latch = false);
     uint8_t ReadInterruptSource(interrupt_target_t interrupt);
     uint8_t GetStatus();
     range_t GetRange();
