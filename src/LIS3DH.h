@@ -1,3 +1,25 @@
+/*!
+ * @file LIS3DH.cpp
+ *
+ *  @mainpage STMicroelectronics LIS3DH - ultra-low-power 3-axis MEMS accelerometer
+ *
+ *  @section Information
+ *
+ *  This is a library for the STMicroelectronics LIS3DH accelerometer sensor with limited functionality support
+ *
+ *  Find more detail on the sensor on https://www.st.com/en/mems-and-sensors/lis3dh.html
+ *
+ *  This library is only supporting I2C interface not SPI.
+ *
+ *  @section author Author
+ *
+ *  MReza Naeemabadi
+ *
+ *  @section license License
+ *
+ *  MIT license, all text above must be included in any redistribution
+ */
+
 #pragma once
 
 #include <Arduino.h>

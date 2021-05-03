@@ -4,13 +4,7 @@ bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
 {
     _wire = &theWire;
     _address = addr;
-
-    if (read(LIS3DH_REG_WHO_AM_I) != LIS3DH_VAL_WHO_AM_I)
-    {
-        printf("Error! Chip ID is %X. Expected %X\r\n", read(LIS3DH_REG_WHO_AM_I), LIS3DH_VAL_WHO_AM_I);
-        return false;
-    }
-    return true;
+    return (read(LIS3DH_REG_WHO_AM_I) == LIS3DH_VAL_WHO_AM_I);
 }
 
 bool LIS3DH::Initialize(TwoWire &theWire)
@@ -18,16 +12,12 @@ bool LIS3DH::Initialize(TwoWire &theWire)
     _wire = &theWire;
     _address = LIS3DH_ADD_PRIMARY;
 
-    uint8_t val_0 = read(LIS3DH_REG_WHO_AM_I);
-    if (val_0 == LIS3DH_VAL_WHO_AM_I)
+    if (read(LIS3DH_REG_WHO_AM_I) == LIS3DH_VAL_WHO_AM_I)
         return true;
 
     _address = LIS3DH_ADD_SECONDARY;
-    uint8_t val_1 = read(LIS3DH_REG_WHO_AM_I);
-    if (val_1 == LIS3DH_VAL_WHO_AM_I)
-        return true;
-    printf("Error! Chip ID results were %X %X. Expected %X\r\n", val_0, val_1, LIS3DH_VAL_WHO_AM_I);
-    return false;
+
+    return (read(LIS3DH_REG_WHO_AM_I) == LIS3DH_VAL_WHO_AM_I);
 }
 
 void LIS3DH::Setup(
