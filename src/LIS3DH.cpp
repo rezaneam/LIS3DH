@@ -1,5 +1,13 @@
 #include <LIS3DH.h>
 
+/*!
+ *  @brief  Initializing the sensor
+ *  @param  address
+ *          i2c address
+ *  @param  theWire
+ *          Wire object
+ * @return  returns true if successful
+ */
 bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
 {
     _wire = &theWire;
@@ -7,6 +15,12 @@ bool LIS3DH::Initialize(TwoWire &theWire, uint8_t addr)
     return (read(LIS3DH_REG_WHO_AM_I) == LIS3DH_VAL_WHO_AM_I);
 }
 
+/*!
+ *  @brief  Initializing the sensor with auto detect address procedure
+ *  @param  theWire
+ *          Wire object, default Wire
+ * @return  returns true if successful
+ */
 bool LIS3DH::Initialize(TwoWire &theWire)
 {
     _wire = &theWire;
@@ -20,6 +34,15 @@ bool LIS3DH::Initialize(TwoWire &theWire)
     return (read(LIS3DH_REG_WHO_AM_I) == LIS3DH_VAL_WHO_AM_I);
 }
 
+/*!
+ *  @brief  Configure the sensor
+ *  @param  mode Operation Mode (Low Power, Normal, Hi Resolution)
+ *  @param  sps sampling frequency 
+ *  @param  range sampling rage
+ *  @param  en_x Enable X axis
+ *  @param  en_y Enable Y xis
+ *  @param  en_z Enable Z axis
+ */
 void LIS3DH::Setup(
     operation_mode_t mode,
     sampling_frequency_t sps,
@@ -71,6 +94,14 @@ void LIS3DH::Setup(
     readReference();
 }
 
+/*!
+ *  @brief Configuring the Motion Detection 
+ *  @param  interrupt target interrupt. Can be INT1 or INT2
+ *  @param  enable enable/disable motion dection interrupt
+ *  @param  threshold interrupt threashold (raw value)
+ *  @param  duration interrupt duration
+ *  @param  enable_latch enables interrupt latch
+ */
 void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t threshold, uint8_t duration, bool enable_latch)
 {
     uint8_t _register =
@@ -107,6 +138,11 @@ void LIS3DH::MotionDetect(interrupt_target_t interrupt, bool enable, uint8_t thr
     readReference();
 }
 
+/*!
+ *  @brief  Getting the source(s) generated interrupt
+ *  @param  interrupt target interrupt can be INT1 or INT2
+ * @return  raw value of the source generated interrupt
+ */
 uint8_t LIS3DH::ReadInterruptSource(interrupt_target_t interrupt)
 {
     uint8_t _register =
@@ -114,6 +150,10 @@ uint8_t LIS3DH::ReadInterruptSource(interrupt_target_t interrupt)
     return read(_register);
 }
 
+/*!
+ *  @brief  Updating the sampling rate
+ *  @param  sps sampling rate
+ */
 void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG1);
@@ -151,6 +191,10 @@ void LIS3DH::SetSamplingFrequency(sampling_frequency_t sps)
     write(LIS3DH_REG_CTRL_REG1, value);
 }
 
+/*!
+ *  @brief Getting the sampling range
+ *  @return sampling range  
+ */
 LIS3DH::range_t LIS3DH::GetRange()
 {
     uint8_t value = (read(LIS3DH_REG_CTRL_REG4) & 0x30) >> 4;
@@ -168,6 +212,10 @@ LIS3DH::range_t LIS3DH::GetRange()
     return range_t::LIS_RANGE_2G;
 }
 
+/*!
+ *  @brief Updating the sampling range
+ *  @param sampling range  
+ */
 void LIS3DH::SetRange(range_t range)
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG4) & 0xCF;
@@ -189,12 +237,19 @@ void LIS3DH::SetRange(range_t range)
     write(LIS3DH_REG_CTRL_REG4, value);
 }
 
+/*!
+ *  @brief Turning sensor off
+ */
 void LIS3DH::PowerDown()
 {
     uint8_t value = read(LIS3DH_REG_CTRL_REG1) & 0xF0;
     write(LIS3DH_REG_CTRL_REG1, value);
 }
 
+/*!
+ *  @brief Getting Sensor mode
+ *  @return Sensor mode 
+ */
 LIS3DH::operation_mode_t LIS3DH::GetMode()
 {
     bool v1 = (bool)((read(LIS3DH_REG_CTRL_REG1) & 0x08) >> 3);
@@ -206,6 +261,10 @@ LIS3DH::operation_mode_t LIS3DH::GetMode()
     return operation_mode_t::LIS_MODE_HIGH_RESOLUTION;
 }
 
+/*!
+ *  @brief Updating Sensor mode
+ *  @param mode sensor mode 
+ */
 void LIS3DH::SetMode(operation_mode_t mode)
 {
     switch (mode)
@@ -225,6 +284,10 @@ void LIS3DH::SetMode(operation_mode_t mode)
     }
 }
 
+/*!
+ *  @brief Setting the activation mode to either low/high
+ *  @param mode activation mode
+ */
 void LIS3DH::SetInterruptActivationMode(interrupt_activation_mode_t mode)
 {
     switch (mode)
@@ -239,16 +302,28 @@ void LIS3DH::SetInterruptActivationMode(interrupt_activation_mode_t mode)
     }
 }
 
+/*!
+ *  @brief Getting Sensor status
+ *  @return raw value of sensor status 
+ */
 uint8_t LIS3DH::GetStatus()
 {
     return read(LIS3DH_REG_STATUS_REG2);
 }
 
+/*!
+ *  @brief Getting unprocessed values of the acceleration
+ *  @param buffer pointer to array will be populated by acceleration values 
+ */
 void LIS3DH::GetAcceleration(uint8_t *_buffer)
 {
     read(LIS3DH_REG_OUT_X_L, 6, _buffer);
 }
 
+/*!
+ *  @brief Getting processed values of the acceleration in mg
+ *  @param buffer pointer to array will be populated by acceleration values (mg)
+ */
 void LIS3DH::GetAcceleration(int16_t *_buffer)
 {
     uint8_t local[6] = {0};
